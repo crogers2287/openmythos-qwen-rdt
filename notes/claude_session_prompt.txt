@@ -1,0 +1,27 @@
+Use gstack for this whole task.
+
+First, run /plan-eng-review on this implementation request before making changes.
+
+Then execute the plan and build the initial codebase in this repo.
+
+Hard requirements:
+- Follow PLAN -> CONTEXT7 DOCS -> RE-ANALYZE -> CODE.
+- Re-run Context7 inside this session for every library you actually use.
+- Use the notes in notes/user_prompt.txt and notes/context7_summary.txt as task context.
+- Treat OpenMythos as inspect-first: verify the installed package source/API before coding against it.
+- Initialize a new Python project here.
+- Generate requirements.txt.
+- Generate the core model_builder.py script that loads Qwen/Qwen3.6-35B-A3B and handles the layer extraction, Prelude/Recurrent Core/Coda mapping, LTI injection scaffold, routing temperature override, and the dual-3090-aware loading path.
+- If the exact OpenMythos or Qwen internals make any requested mapping impossible to implement faithfully, do not fake it. Inspect the real code, document the constraint, and implement the closest truthful scaffold with TODOs and validation hooks.
+- Do not start dataset download or the full training loop yet.
+- Instead, prepare the repo so the next step can do that cleanly after user confirmation.
+
+Deliverables for this pass:
+1. requirements.txt
+2. model_builder.py
+3. Any minimal supporting config/util files required for those to work
+4. A short README or notes file explaining assumptions, blockers, and next steps
+
+Before stopping:
+- Verify imports and basic syntax for the files you create.
+- Summarize: files changed, commands run, validation results, and what needs user confirmation next.

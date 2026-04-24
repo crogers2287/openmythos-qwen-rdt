@@ -1,0 +1,10 @@
+torch>=2.11.0
+transformers>=5.6.0
+open-mythos>=0.5.0
+datasets>=4.8.0
+accelerate>=1.6.0
+peft>=0.15.0
+muon-optimizer>=0.1.0
+trl>=0.18.0
+huggingface-hub>=0.30.0
+safetensors>=0.5.0

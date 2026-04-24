@@ -1,0 +1,31 @@
+Act as an expert Distributed AI Systems Engineer. Your task is to build a local training and inference pipeline that retrofits the Qwen/Qwen3.6-35B-A3B Mixture-of-Experts model into a Recurrent-Depth Transformer (RDT) using the OpenMythos framework.
+
+Hardware Constraints:
+You must optimize this architecture to run entirely on a local workstation equipped with dual NVIDIA RTX 3090 GPUs (Total: 48GB VRAM).
+
+Please implement this system step-by-step by generating the necessary Python scripts, configuration files, and training loops based on the following architectural blueprint:
+
+Phase 1: Codebase Initialization & Dependencies
+1. Initialize a new Python project and install the open-mythos library along with PyTorch, transformers, accelerate, and bitsandbytes.
+2. If possible, integrate unsloth to utilize their custom MoE Triton kernels, which provide a significant VRAM reduction and speedup for Qwen 3.6 MoE models.
+
+Phase 2: Architectural Retrofitting (The OpenMythos Fusion)
+Write a model configuration script that loads the Qwen3.6-35B-A3B base weights and maps its 40-layer structure into the three-stage OpenMythos paradigm:
+1. Prelude: Map Qwen 3.6 layers 0-3 (the first hybrid motif of 3 Gated DeltaNet layers + 1 Gated Attention layer) as the static input projector.
+2. Recurrent Core: Isolate layers 16-19 to act as the looped recurrent block. Configure the loop to iterate up to a max_loop_iters of 16.
+3. Coda: Map layers 36-39 as the static output projector.
+4. Stabilizers: Wrap the Recurrent Core in the OpenMythos Linear Time-Invariant (LTI) injection mechanism. You must enforce the Parcae stability formula: constrain the spectral radius of the hidden state update matrix to be strictly less than 1 (rho(A) < 1) via a continuous negative diagonal parameterization to prevent residual explosion during deep loops.
+5. Routing Ablation: To prevent the MoE routing from collapsing due to DeltaNet's recurrent memory state, set the MoE routing softmax temperature to 2.0.
+
+Phase 3: Hardware Optimization (The Dual 3090 Setup)
+1. Quantization: Load the frozen base weights of the Qwen model strictly in 4-bit precision (NF4 via bitsandbytes or Q4_K_M GGUF format) so the static footprint stays around 22GB to 24GB.
+2. Parallelism: Implement Pipeline Parallelism or Fully Sharded Data Parallel (FSDP) using Hugging Face Accelerate to split the workload across cuda:0 and cuda:1. Crucial note: Do not use DeepSpeed ZeRO-3, as its parameter partitioning conflicts with LoRA adapters on this specific MoE architecture; drop down to ZeRO-2 or FSDP.
+
+Phase 4: The Training Loop (Recurrent Distillation)
+Write the Supervised Fine-Tuning (SFT) script to teach the model how to loop:
+1. Target Parameters: Freeze all 4-bit base weights. Apply trainable Depth-Wise LoRA adapters to the MoE routing gates, and keep the LTI injection matrices in full FP32 precision.
+2. Optimizer: Utilize the Muon optimizer (or AdamW if Muon is unavailable) for stable training of the looped hidden states.
+3. Dataset: Configure the dataloader to pull the Roman1111111/claude-opus-4.6-10000x reasoning distillation dataset from Hugging Face. Format the data to focus on structured reasoning, problem decomposition, and step-by-step logic.
+4. Gradient Checkpointing: Enable aggressive gradient checkpointing to handle the massive activation memory overhead caused by backpropagation through time across the 16 loops.
+
+Please begin by generating the requirements.txt and the core model_builder.py script that handles the layer extraction and LTI injection. Ask me for confirmation before initiating the dataset download and training loop.

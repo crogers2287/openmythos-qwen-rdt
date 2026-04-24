@@ -1,0 +1,40 @@
+Context7 ground truth gathered before coding:
+
+1. OpenMythos
+- Context7 search did not return a valid OpenMythos library entry.
+- PyPI package exists: open-mythos 0.5.0
+- GitHub repo found: https://github.com/kyegomez/OpenMythos
+- Package exposes open_mythos.main with MythosConfig and OpenMythos.
+- README states OpenMythos implements Prelude + looped Recurrent Block + Coda and supports sparse MoE.
+
+2. Transformers
+- Valid Context7 ID: /huggingface/transformers
+- Relevant API: AutoModelForCausalLM.from_pretrained(..., quantization_config=BitsAndBytesConfig(...), device_map="auto")
+- Relevant topics: 4-bit loading, NF4, gradient checkpointing, PEFT/LoRA integration.
+
+3. Accelerate
+- Valid Context7 ID: /huggingface/accelerate
+- Relevant topic: FSDP config and 2-GPU distributed training.
+- Use Accelerate for FSDP or pipeline/distributed setup. Avoid DeepSpeed ZeRO-3 per task constraints.
+
+4. bitsandbytes
+- Valid Context7 ID: /bitsandbytes-foundation/bitsandbytes
+- Relevant API: Linear4bit / LinearNF4 and NF4 4-bit quantization patterns for QLoRA.
+
+5. Unsloth
+- Valid Context7 ID: /unslothai/unsloth
+- Relevant topic: 4-bit loading, LoRA, Qwen support, continued finetuning APIs through FastLanguageModel.
+- Needs compatibility check for Qwen3.6 MoE.
+
+6. PyTorch
+- Valid Context7 ID: /pytorch/pytorch
+- Relevant topic: gradient checkpointing, distributed/pipeline patterns, matrix-constraint utilities.
+
+Additional grounding:
+- Hugging Face model search confirms Qwen/Qwen3.6-35B-A3B exists.
+- Hugging Face search also confirms unsloth/Qwen3.6-35B-A3B-GGUF exists.
+
+Directive for Claude Code:
+- Follow PLAN -> CONTEXT7 DOCS -> RE-ANALYZE -> CODE.
+- Re-run Context7 inside the session for any library you end up using beyond these.
+- Treat OpenMythos API as inspect-first: verify installed package source before coding against it.

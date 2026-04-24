@@ -1,0 +1,19 @@
+Server connection details extracted from screenshot OCR.
+
+Visible connection details:
+- SSH command: ssh -p 30355 ubuntu@50.35.188.53
+- Additional visible secret-looking string: fk.KS5F@gouJC
+- Additional visible IP: 192.168.100.235
+
+Visible hardware / instance details:
+- NVIDIA RTX PRO 6000 Blackwell Server Edition
+- 1 GPU
+- 6 vCPU
+- 96GB RAM
+- 150GB Ephemeral
+- 50GB Persistent
+
+Notes:
+- The label for fk.KS5F@gouJC was not visible in the OCR crop. It may be a password, token, or another connection field. Treat it as a secret and do not guess its label.
+- 192.168.100.235 appears as an additional IP in the screenshot and is likely an internal/private IP, but the label was not visible in the OCR crop.
+- OCR confidence was strongest for the SSH command and both IP-like strings. The exact casing of the secret-looking string was read as fk.KS5F@gouJC.

@@ -1,0 +1,57 @@
+ARCHITECTURE CHANGE — replace the prior dual-3090 / 4-bit / multi-GPU plan with this updated target.
+
+Act as an expert Distributed AI Systems Engineer. Your task is to build a training pipeline that performs "recurrent distillation" on a pre-trained reasoning model, converting it from a fixed-depth model into a Recurrent-Depth Transformer (RDT) using the OpenMythos framework.
+
+Hardware & Environment Constraints:
+- Target Hardware: A single cloud-based NVIDIA A100 80GB GPU (e.g., RunPod).
+- Because we have 80GB of VRAM, do NOT use 4-bit quantization or multi-GPU pipeline parallelism. Load the model natively in bfloat16 precision for optimal mathematical stability.
+
+Please implement this system step-by-step by generating the necessary Python scripts and configuration files based on the following architectural blueprint:
+
+Phase 1: Codebase Initialization & Dependencies
+1. Initialize a new Python project and install open-mythos, PyTorch, transformers, and unsloth.
+2. Configure the script to utilize Unsloth's custom MoE Triton kernels for maximum VRAM efficiency and training speed.
+
+Phase 2: Architectural Retrofitting (The OpenMythos Fusion)
+1. Base Model: Load the pre-trained, reasoning-distilled weights from Hugging Face: hesamation/Qwen3.6-35B-A3B-Claude-4.6-Opus-Reasoning-Distilled.
+2. Layer Mapping: Map the 40-layer structure into the three-stage OpenMythos paradigm:
+   - Prelude: Qwen layers 0-3 (static input projector).
+   - Recurrent Core: Qwen layers 16-19 (looped block, configure max_loop_iters to 16).
+   - Coda: Qwen layers 36-39 (static output projector).
+3. Stabilizers: Wrap the Recurrent Core in the OpenMythos Linear Time-Invariant (LTI) injection mechanism. You must enforce the Parcae stability formula: constrain the spectral radius of the hidden state update matrix to be strictly less than 1 (rho(A) < 1) via a continuous negative diagonal parameterization to prevent residual explosion during the loops.
+4. Routing Ablation: Set the MoE routing softmax temperature to 2.0 to prevent routing collapse caused by DeltaNet's recurrent memory state.
+
+Phase 3: The Training Loop (Recurrent Distillation)
+1. Unsloth Integration: Wrap the newly mapped model using Unsloth's FastModel. Crucially, you must explicitly enable fine-tuning on the MoE router layers, as Unsloth disables router fine-tuning by default.
+2. Target Parameters: Freeze all base model weights. Apply trainable Depth-Wise LoRA adapters to the MoE routing gates, and ensure the LTI injection matrices remain fully trainable in FP32 precision.
+3. Dataset: Configure the dataloader to pull the Roman1111111/claude-opus-4.6-10000x dataset. We are using this data simply to flow structured reasoning traces through the loops, allowing the new LTI stabilizers and routers to learn how to pass complex thoughts in a circle.
+4. Memory Management: Enable aggressive gradient checkpointing to handle the massive activation memory overhead caused by backpropagation through time across the 16 loops. Use the Muon optimizer if available, otherwise fallback to AdamW.
+
+Updated deliverables for this pass:
+1. requirements.txt
+2. train_recurrent_distillation.py
+3. Any minimal supporting config/util files required for those to work
+4. A short README or notes file explaining assumptions, blockers, and next steps
+
+Critical changes from the prior prompt:
+- Single A100 80GB only
+- bfloat16 native loading
+- No 4-bit quantization
+- No multi-GPU pipeline parallelism or split routing
+- Base model is hesamation/Qwen3.6-35B-A3B-Claude-4.6-Opus-Reasoning-Distilled
+- Primary script target is train_recurrent_distillation.py instead of model_builder.py
+- Objective is recurrent distillation with Unsloth FastModel wrapping
+
+Instructions:
+- Continue to use gstack for this whole task.
+- If needed, answer the current gstack prompt with the recommended default and proceed.
+- Re-run /plan-eng-review for the updated scope if the prior review assumptions changed materially.
+- Follow PLAN -> CONTEXT7 DOCS -> RE-ANALYZE -> CODE.
+- Re-run Context7 inside this session for every library you actually use.
+- Do not start dataset download or the actual training loop yet.
+- Ask for confirmation before initiating dataset download or training.
+- If any requested API or architecture assumption is not supported by the real libraries, do not fake it. Inspect, document the gap, and implement the closest truthful scaffold with TODOs and validation hooks.
+
+Before stopping:
+- Verify imports and basic syntax for the files you create.
+- Summarize: files changed, commands run, validation results, and what needs user confirmation next.

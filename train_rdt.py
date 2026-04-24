@@ -90,9 +90,11 @@ def load_model(args):
 
 def find_text_model(model):
     """Navigate to the text model and its layers."""
-    # Qwen3.5 MoE: model.model.language_model.layers
+    # Qwen3.5 MoE CausalLM: model.model.layers
+    # Qwen3.5 MoE ConditionalGen (Unsloth): model.model.language_model.layers
     for path in [
-        "model.language_model",
+        "model",                        # Qwen3_5MoeForCausalLM via transformers
+        "model.language_model",         # Qwen3_5MoeForConditionalGeneration via Unsloth
         "model.model.language_model",
         "model.model",
     ]:
